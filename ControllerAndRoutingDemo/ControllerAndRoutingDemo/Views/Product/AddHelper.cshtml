@@ -1,0 +1,30 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@{
+    String title = "Add Product using Helper method";
+}
+<h1>@title</h1>
+@using (Html.BeginForm("SaveHelperRequest", "Product", FormMethod.Post))
+{
+    <p>
+        @Html.Label("Id")&nbsp;
+        @Html.TextBox("Id")
+    </p>
+    <p>
+        @Html.Label("Name")&nbsp;
+        @Html.TextBox("Name")
+    </p>
+    <p>
+        @Html.Label("Qty")&nbsp;
+        @Html.TextBox("Qty")
+    </p>
+    <p>
+        @Html.Label("Rate")&nbsp;
+        @Html.TextBox("Rate")
+    </p>
+    <p>
+<input type ="submit" value="Save" />
+    </p>
+
+}

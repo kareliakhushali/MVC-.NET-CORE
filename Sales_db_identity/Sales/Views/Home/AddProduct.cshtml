@@ -1,0 +1,174 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
+@model ProductViewModel
+@{
+    ViewBag.Title = "New Product";
+    String ImagePath = string.Empty;
+}
+<form asp-controller="Home" asp-action="Save" method="post"
+      class="m-3" enctype="multipart/form-data">
+    <input type="hidden" asp-for="Id" />
+    <input type="hidden" asp-for="Profile" />
+
+    <div class=" row m-2">
+        <label asp-for="Name" class="col-sm-2 col-form-label"></label>
+        <input asp-for="Name" class="col-sm-4 col-form-control" />
+        <span id="spnNameError" style="color:red" class="col-sm-3">*</span>
+    </div>
+    <div class=" row m-2">
+        <label asp-for="Qty" class="col-sm-2 col-form-label"></label>
+        <input asp-for="Qty" class="col-sm-4 col-form-control" />
+        <span id="spnQtyError" style="color:red" class="col-sm-3">*</span>
+    </div>
+    <div class=" row m-2">
+        <label asp-for="Rate" class="col-sm-2 col-form-label"></label>
+        <input asp-for="Rate" class="col-sm-4 col-form-control" />
+        <span id="spnRateError" style="color:red" class="col-sm-3">*</span>
+    </div>
+    <div class="row m-2">
+        <label class="col-sm-2 col-form-label">Is-Active</label>
+        <div class="col-10">
+            <div class="form-check form-check-inline">
+                <label class="form-check-label" asp-for="IsActive">Active</label>
+                <input class="form-check-label" asp-for="IsActive" />
+
+
+            </div>
+        </div>
+    </div>
+    <div class="row m-2">
+        <label asp-for="Category" class="col-sm-2 col-form-label"></label>
+        <select asp-for="CatId" asp-items="@(new SelectList(ViewBag.Category,"Id","Name"))"
+                class="col-sm-5"></select>
+    </div>
+    @{
+        if (Model.Profile == null)
+        {
+            ImagePath = "/Images/default.jpg";
+        }
+        else
+        {
+            ImagePath = "/Images/" + Model.Profile;
+        }
+    }
+    <div class="row m-2">
+        <div class="col-sm-2"><label asp-for="Profile" class="form-label"></label></div>
+        <div class="col-sm-2">
+            <img class="img-thumbnail" width="auto" height="20%"
+                 src="@ImagePath" asp-append-version="true" />
+        </div>
+        <div class="col-sm-4">
+            <input asp-for="Image" accept="image/png, image/jpeg" class="form-control col-sm-5" />
+        </div>
+    </div>
+    <div class="row m-2">
+        <button type="submit" class="btn btn-success col-sm-2" id="btnSave">Save</button>
+    </div>
+</form>
+    @section Scripts
+    {
+    <script>
+        function IsBlank(input) {
+            let value = input.val().trim();
+            if (value == undefined || value == '')
+                return true;
+            return false;
+        }
+        function IsOnlyNumeric(input) {
+            let value = input.val().trim();
+            return isNaN(value);
+        }
+        $(document).ready(function () {
+            $("#btnSave").on("click", function (event) {
+                $("#spnNameError").text("*");
+                $("#spnQtyError").text("*");
+                $("#spnRateError").text("*");
+                let name = $("#Name");
+                let qty = $("#Qty");
+                let rate = $("#Rate");
+                let error = false;
+                let CatId = $("#CatId");
+                if (IsBlank(name)) {
+                    $("#spnNameError").text("Name should not be empty");
+                    error = true;
+                }
+                if (qty.val() <= 0) {
+                    $("#spnQtyError").text("Qty should be more than zero");
+                    error = true;
+                }
+                if (rate.val() <= 0) {
+                    $("#spnRateError").text("Rate should be more than zero");
+                    error = true;
+                }
+                if (error) {
+                    event.preventDefault();
+                }
+                else {
+                    if ($("#Id").val() != 0 && name.val().trim() != '') {
+                        /* $.post("/Home/CheckUpdateUnique", { name: name.val().trim(), catId: CatId.val(), prodId: $("#Id").val() },
+                        function (data) {
+                            alert(data);
+                            if (!data) {
+                                alert("Duplicate product not allowed");
+                                //error = true;
+                                event.preventDefault();
+                            }
+                            else {
+                                alert("Success");
+                            }
+                        })*/
+                        $.ajax("/Home/CheckUpdateUnique", {
+                            type: 'POST',
+                            async: false,
+                            dataType: 'json',
+                            data: { name: name.val().trim(), catId: CatId.val(), prodId: $("#Id").val() },
+                            success: function (data, status, xhr) {
+                                if (!data) {
+                                    alert("Duplicate product is not allowed");
+                                    event.preventDefault();
+                                }
+
+                            },
+                            error: function (jqXhr, textStatus, errorMessage) {
+                                alert(errorMessage);
+                            }
+                        });
+                    }
+                    else {
+                        $.ajax("/Home/CheckInsertUnique", {
+                            type: 'POST',
+                            async: false,
+                            dataType: 'json',
+                            data: { name: name.val().trim(), catId: CatId.val() },
+                            success: function (data, status, xhr) {
+                                if (!data) {
+                                    alert("Duplicate product is not allowed");
+                                    event.preventDefault();
+                                }
+                            },
+                            error: function (jqXhr, textStatus, errorMessage) {
+                                alert(errorMessage);
+                            }
+                        });
+
+                        /* $.post("/Home/CheckInsertUnique", { name: name.val().trim(), catId: CatId.val() },
+                        function (data) {
+                            alert(data);
+                            if (data==false) {
+                                alert("Duplicate product not allowed");
+                                //error = true;
+                                event.preventDefault();
+                            }
+                            
+                        })*/
+
+
+                    }
+
+                }
+
+            })
+        })
+    </script>
+    }

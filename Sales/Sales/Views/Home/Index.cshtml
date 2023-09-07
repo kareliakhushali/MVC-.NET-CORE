@@ -1,0 +1,46 @@
+﻿@model IEnumerable<ProductViewModel>
+@{ 
+    ViewData["Title"] = "Home Page";
+    string imagePath = string.Empty; 
+}
+<nav class="navbar navbar-light mt-1">
+    <a class="navbar-brand btn btn-outline-success" asp-action="AddProduct" asp-controller="Home">Add</a>
+</nav>
+
+<div class="mt-3 bg-success bg-opacity-50">
+    <div class="row row-cols-1 row-cols-md-3 g-4 ms-1 mt-3 me-1">
+        @foreach (ProductViewModel each in Model)
+        {
+            if (each.Profile == null)
+            {
+                imagePath = @"\Images\default.jpg";
+            }
+            else
+                imagePath = @"\Images\" + each.Profile;
+
+<div class="col border-primary mb-2">
+    <div class="card bg-opacity-25 bg-success h-100">
+        @*<img src="@imagePath" class="card-img-top" alt="Profile Image Not Found" />*@
+        <img src="@imagePath" class="card-img-top" alt="Profile Image not found"/>
+        <div class="card-body">
+            <h5 class="card-title">@each.Name</h5>
+            <hr />
+            <p class="card-text">@each.Category</p>
+            <p class="card-text">@each.Rate</p>
+        </div>
+        <div class="card-footer">
+            <form asp-action="Delete" asp-controller="Home" asp-route-Id="@each.Id" method="post">
+                <a asp-action="Edit" style="width:30%" asp-route-Id="@each.Id" class="btn btn-success" 
+                   asp-controller="Home">Edit</a>
+                @*<input  type="submit" class="btn btn-danger" value="Delete" style="width:30%" />*@
+                <input type="submit" class="btn btn-danger" value="Delete" style="width:30%"/>
+            </form>
+        </div>
+
+
+
+    </div>
+</div>
+    }
+    </div>
+</div>
